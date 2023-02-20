@@ -5,7 +5,7 @@ const msg = document.querySelector(".msg");
 const userList = document.querySelector("#users");
 
 myForm.addEventListener("submit", onSubmit);
-let user = 1;
+
 function onSubmit(e) {
   e.preventDefault();
 
@@ -28,8 +28,7 @@ function onSubmit(e) {
 
     // Append to ul
     userList.appendChild(li);
-    localStorage.setItem(`User${user}`, userData);
-    user++;
+    localStorage.setItem(`${emailInput.value}`, userData);
     nameInput.value = "";
     emailInput.value = "";
   }
