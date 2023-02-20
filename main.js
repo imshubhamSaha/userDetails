@@ -20,7 +20,12 @@ function onSubmit(e) {
     li.appendChild(
       document.createTextNode(`${nameInput.value}: ${emailInput.value}`)
     );
-    const userData = `${nameInput.value}:${emailInput.value}`;
+
+    const userData = JSON.stringify({
+      name: nameInput.value,
+      email: emailInput.value,
+    });
+
     // Append to ul
     userList.appendChild(li);
     localStorage.setItem(`User${user}`, userData);
