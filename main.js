@@ -81,18 +81,39 @@ function removeItem(e) {
 function editItem(e) {
   if (e.target.classList.contains("editBtn")) {
     // console.log(e.target.parentElement.childNodes);
-    const key = e.target.parentElement.childNodes[1].nodeValue.trim();
+    // const key = e.target.parentElement.childNodes[1].nodeValue.trim();
+    // const li = e.target.parentElement;
+    // userList.removeChild(li);
+    // localStorage.removeItem(`${key}`);
+    // nameInput.value = e.target.parentElement.childNodes[0].nodeValue.replace(
+    //   ":",
+    //   ""
+    // );
+    // emailInput.value = e.target.parentElement.childNodes[1].nodeValue.replace(
+    //   " ",
+    //   ""
+    // );
     const li = e.target.parentElement;
-    userList.removeChild(li);
-    localStorage.removeItem(`${key}`);
-    nameInput.value = e.target.parentElement.childNodes[0].nodeValue.replace(
-      ":",
-      ""
-    );
-    emailInput.value = e.target.parentElement.childNodes[1].nodeValue.replace(
-      " ",
-      ""
-    );
+    axios
+      .delete(
+        `https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata/${li.id}`
+      )
+      .then((response) => {
+        console.log(response);
+        userList.removeChild(li);
+        nameInput.value =
+          e.target.parentElement.childNodes[0].nodeValue.replace(":", "");
+        emailInput.value =
+          e.target.parentElement.childNodes[1].nodeValue.replace(" ", "");
+      })
+      .catch((err) => {
+        console.error(err);
+        msg.classList.add("error");
+        msg.innerHTML = "Something Went wrong";
+        setTimeout(() => {
+          msg.remove();
+        }, 3000);
+      });
   }
 }
 
