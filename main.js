@@ -53,10 +53,27 @@ function removeItem(e) {
   if (e.target.classList.contains("delBtn")) {
     if (confirm("Are You Sure?")) {
       // console.log(e.target.parentElement.childNodes);
-      const key = e.target.parentElement.childNodes[1].nodeValue.trim();
+      // const key = e.target.parentElement.childNodes[1].nodeValue.trim();
+      // const li = e.target.parentElement;
+      // userList.removeChild(li);
+      // localStorage.removeItem(`${key}`);
       const li = e.target.parentElement;
-      userList.removeChild(li);
-      localStorage.removeItem(`${key}`);
+      axios
+        .delete(
+          `https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata/${li.id}`
+        )
+        .then((response) => {
+          console.log(response);
+          userList.removeChild(li);
+        })
+        .catch((err) => {
+          console.error(err);
+          msg.classList.add("error");
+          msg.innerHTML = "Something Went wrong";
+          setTimeout(() => {
+            msg.remove();
+          }, 3000);
+        });
     }
   }
 }
@@ -81,6 +98,7 @@ function editItem(e) {
 
 function showOnUI(obj) {
   const li = document.createElement("li");
+  li.id = obj._id;
   const btn = document.createElement("button");
   const edit = document.createElement("button");
 
@@ -119,7 +137,7 @@ function getData() {
       "https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata"
     )
     .then((response) => {
-      // console.log(response);
+      console.log(response);
       for (let i = 0; i < response.data.length; i++) {
         showOnUI(response.data[i]);
       }
