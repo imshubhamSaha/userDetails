@@ -4,122 +4,18 @@ const emailInput = document.querySelector("#email");
 const msg = document.querySelector(".msg");
 const userList = document.querySelector("#users");
 
-myForm.addEventListener("submit", onSubmit);
-userList.addEventListener("click", removeItem);
-userList.addEventListener("click", editItem);
-window.addEventListener("DOMContentLoaded", getData);
+//helper
+const helper = {
+  type: "post",
+  UserName: null,
+  userEmail: null,
+  _id: null,
+};
 
-function onSubmit(e) {
-  e.preventDefault();
-  if (nameInput.value === "" || !emailInput.value.includes("@")) {
-    msg.classList.add("error");
-    msg.innerHTML = "Please enter all fields";
-
-    setTimeout(() => msg.remove(), 3000);
-  } else {
-    const UserName = nameInput.value;
-    const userEmail = emailInput.value;
-    const userData = {
-      UserName,
-      userEmail,
-    };
-
-    axios
-      .post(
-        "https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata",
-        userData
-      )
-      .then((response) => {
-        showOnUI(response.data);
-        // console.log(response);
-      })
-      .catch((err) => {
-        console.error(err);
-        msg.classList.add("error");
-        msg.innerHTML = "Something Went wrong";
-
-        setTimeout(() => {
-          msg.remove();
-          nameInput.value = "";
-          emailInput.value = "";
-        }, 3000);
-      });
-    // showOnUI(userData);
-    // uploadLocalStore(userData);
-  }
-}
-
-function removeItem(e) {
-  if (e.target.classList.contains("delBtn")) {
-    if (confirm("Are You Sure?")) {
-      // console.log(e.target.parentElement.childNodes);
-      // const key = e.target.parentElement.childNodes[1].nodeValue.trim();
-      // const li = e.target.parentElement;
-      // userList.removeChild(li);
-      // localStorage.removeItem(`${key}`);
-      const li = e.target.parentElement;
-      axios
-        .delete(
-          `https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata/${li.id}`
-        )
-        .then((response) => {
-          console.log(response);
-          userList.removeChild(li);
-        })
-        .catch((err) => {
-          console.error(err);
-          msg.classList.add("error");
-          msg.innerHTML = "Something Went wrong";
-          setTimeout(() => {
-            msg.remove();
-          }, 3000);
-        });
-    }
-  }
-}
-
-function editItem(e) {
-  if (e.target.classList.contains("editBtn")) {
-    // console.log(e.target.parentElement.childNodes);
-    // const key = e.target.parentElement.childNodes[1].nodeValue.trim();
-    // const li = e.target.parentElement;
-    // userList.removeChild(li);
-    // localStorage.removeItem(`${key}`);
-    // nameInput.value = e.target.parentElement.childNodes[0].nodeValue.replace(
-    //   ":",
-    //   ""
-    // );
-    // emailInput.value = e.target.parentElement.childNodes[1].nodeValue.replace(
-    //   " ",
-    //   ""
-    // );
-    const li = e.target.parentElement;
-    axios
-      .delete(
-        `https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata/${li.id}`
-      )
-      .then((response) => {
-        console.log(response);
-        userList.removeChild(li);
-        nameInput.value =
-          e.target.parentElement.childNodes[0].nodeValue.replace(":", "");
-        emailInput.value =
-          e.target.parentElement.childNodes[1].nodeValue.replace(" ", "");
-      })
-      .catch((err) => {
-        console.error(err);
-        msg.classList.add("error");
-        msg.innerHTML = "Something Went wrong";
-        setTimeout(() => {
-          msg.remove();
-        }, 3000);
-      });
-  }
-}
-
-function showOnUI(obj) {
+// Functions
+const showOnUI = function (obj, id) {
   const li = document.createElement("li");
-  li.id = obj._id;
+  li.id = !id ? obj._id : id;
   const btn = document.createElement("button");
   const edit = document.createElement("button");
 
@@ -136,29 +32,131 @@ function showOnUI(obj) {
   userList.appendChild(li);
   nameInput.value = "";
   emailInput.value = "";
-}
+};
 
-// function uploadLocalStore(obj) {
-//   localStorage.setItem(`${obj.userEmail}`, JSON.stringify(obj));
-//   nameInput.value = "";
-//   emailInput.value = "";
-// }
+const onSubmit = function (e) {
+  e.preventDefault();
+  if (nameInput.value === "" || !emailInput.value.includes("@")) {
+    msg.classList.add("error");
+    msg.innerHTML = "Please enter all fields";
 
-function getData() {
-  // const localStorageobj = localStorage;
-  // const localStorageKeys = Object.keys(localStorageobj);
-  // for (let i = 0; i < localStorageKeys.length; i++) {
-  //   const key = localStorageKeys[i];
-  //   const userDetailsJson = localStorageobj[key];
-  //   const userDetailsObj = JSON.parse(userDetailsJson);
-  //   showOnUI(userDetailsObj);
-  // }
+    setTimeout(() => msg.remove(), 3000);
+  } else {
+    const UserName = nameInput.value;
+    const userEmail = emailInput.value;
+    const userData = {
+      UserName,
+      userEmail,
+    };
+    if (helper.type === "post") {
+      axios
+        .post(
+          "https://crudcrud.com/api/bfdd7fc07ddd4564a61cbe6276b85ce1/bookingdata",
+          userData
+        )
+        .then((response) => {
+          showOnUI(response.data);
+        })
+        .catch((err) => {
+          console.error(err);
+          msg.classList.add("error");
+          msg.innerHTML = "Something Went wrong";
+
+          setTimeout(() => {
+            msg.remove();
+            nameInput.value = "";
+            emailInput.value = "";
+          }, 3000);
+        });
+    } else {
+      axios
+        .put(
+          `https://crudcrud.com/api/bfdd7fc07ddd4564a61cbe6276b85ce1/bookingdata/${helper._id}`,
+          userData
+        )
+        .then((response) => {
+          // console.log(response);
+          showOnUI(userData, helper._id);
+          nameInput.value = "";
+          emailInput.value = "";
+          helper.type = "post";
+          helper._id = null;
+          helper.UserName = null;
+          helper.userEmail = null;
+        })
+        .catch((err) => {
+          console.error(err);
+          msg.classList.add("error");
+          msg.innerHTML = "Something Went wrong";
+          setTimeout(() => {
+            msg.remove();
+          }, 3000);
+          showOnUI(helper);
+          helper.type = "post";
+          helper._id = null;
+          helper.UserName = null;
+          helper.userEmail = null;
+        });
+    }
+  }
+};
+
+const removeItem = function (e) {
+  if (e.target.classList.contains("delBtn")) {
+    if (confirm("Are You Sure?")) {
+      const li = e.target.parentElement;
+      axios
+        .delete(
+          `https://crudcrud.com/api/bfdd7fc07ddd4564a61cbe6276b85ce1/bookingdata/${li.id}`
+        )
+        .then((response) => {
+          // console.log(response);
+          userList.removeChild(li);
+        })
+        .catch((err) => {
+          console.error(err);
+          msg.classList.add("error");
+          msg.innerHTML = "Something Went wrong";
+          setTimeout(() => {
+            msg.remove();
+          }, 3000);
+        });
+    }
+  }
+};
+
+const editItem = function (e) {
+  if (e.target.classList.contains("editBtn")) {
+    const li = e.target.parentElement;
+    helper.type = "edit";
+    helper._id = li.id;
+    helper.UserName = e.target.parentElement.childNodes[0].nodeValue.replace(
+      ":",
+      ""
+    );
+    helper.userEmail = e.target.parentElement.childNodes[1].nodeValue.replace(
+      " ",
+      ""
+    );
+    userList.removeChild(li);
+    nameInput.value = e.target.parentElement.childNodes[0].nodeValue.replace(
+      ":",
+      ""
+    );
+    emailInput.value = e.target.parentElement.childNodes[1].nodeValue.replace(
+      " ",
+      ""
+    );
+  }
+};
+
+const getData = function () {
   axios
     .get(
-      "https://crudcrud.com/api/9e837c7becf445caa946637186238fbd/bookingdata"
+      "https://crudcrud.com/api/bfdd7fc07ddd4564a61cbe6276b85ce1/bookingdata"
     )
     .then((response) => {
-      console.log(response);
+      // console.log(response);
       for (let i = 0; i < response.data.length; i++) {
         showOnUI(response.data[i]);
       }
@@ -171,4 +169,10 @@ function getData() {
         msg.remove();
       }, 3000);
     });
-}
+};
+
+// Events
+myForm.addEventListener("submit", onSubmit);
+userList.addEventListener("click", removeItem);
+userList.addEventListener("click", editItem);
+window.addEventListener("DOMContentLoaded", getData);
